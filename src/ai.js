@@ -15,11 +15,25 @@ document.body.appendChild(canvas);
 // create engine
 let engine = Engine.create();
 
+engine.world.gravity.scale = 0;
+
 let runner = Runner.create({
 	delta: 1000 / 30,
 	isFixed: false,
 	enabled: true,
 });
+
+// create bodies
+let world = [
+	Bodies.rectangle(250, 100, 300, 25, { isStatic: true }),
+	Bodies.rectangle(100, 350, 25, 500, { isStatic: true }),
+	Bodies.rectangle(250, 600, 300, 25, { isStatic: true }),
+	Bodies.rectangle(400, 350, 25, 500, { isStatic: true }),
+
+	Bodies.circle(200, 350, 13),
+]
+
+World.add(engine.world, world);
 
 // mouse control
 let mouse = Mouse.create(canvas);
@@ -66,5 +80,9 @@ ctx.font = "1em Arial";
 		}
 
 		ctx.lineTo(vertices[0].x, vertices[0].y);
+
+		ctx.fillStyle = body.render.fillStyle;
+
+		ctx.fill();
 	}
 })();

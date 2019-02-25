@@ -92,7 +92,7 @@
 				motion: 0,
 				sleepThreshold: 60,
 				density: 0.001,
-				restitution: 0,
+				restitution: 0.5,
 				friction: 0.1,
 				frictionStatic: 0.5,
 				frictionAir: 0.01,
@@ -184,7 +184,7 @@
 			});
 	
 			// render properties
-			var defaultFillStyle = (body.isStatic ? '#2e2b44' : Common.choose(['#006BA6', '#0496FF', '#FFBC42', '#D81159', '#8F2D56'])),
+			var defaultFillStyle = (body.isStatic ? '#212126' : Common.choose(['#006BA6', '#0496FF', '#FFBC42', '#D81159', '#8F2D56'])),
 				defaultStrokeStyle = '#000';
 			body.render.fillStyle = body.render.fillStyle || defaultFillStyle;
 			body.render.strokeStyle = body.render.strokeStyle || defaultStrokeStyle;

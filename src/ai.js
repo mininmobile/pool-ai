@@ -13,7 +13,7 @@ canvas.height = document.body.scrollHeight;
 document.body.appendChild(canvas);
 
 // ai configuration
-let layers = 100;
+let layers = 1;
 let iterations = 1;
 
 // create engines
@@ -23,6 +23,7 @@ for (let i = 0; i < layers; i++) {
 	let engine = Engine.create();
 	engines.push(engine);
 	
+	engine.enableSleeping = true;
 	engine.world.gravity.scale = 0;
 	
 	let runner = Runner.create({
@@ -33,10 +34,17 @@ for (let i = 0; i < layers; i++) {
 
 	// create world
 	let walls = [
-		Bodies.rectangle(250, 100, 300, 25, { isStatic: true }),
-		Bodies.rectangle(100, 350, 25, 500, { isStatic: true }),
-		Bodies.rectangle(250, 600, 300, 25, { isStatic: true }),
-		Bodies.rectangle(400, 350, 25, 500, { isStatic: true }),
+		Bodies.rectangle(250, 100, 300, 25,  { isStatic: true }),
+		Bodies.rectangle(250, 600, 300, 25,  { isStatic: true }),
+		Bodies.rectangle(100, 350, 25,  500, { isStatic: true }),
+		Bodies.rectangle(400, 350, 25,  500, { isStatic: true }),
+
+		Bodies.trapezoid(250, 124, 220, 25, toRad(15), { angle: toRad(180), isStatic: true }),
+		Bodies.trapezoid(124, 245, 210, 25, toRad(15), { angle: toRad(90), isStatic: true }),
+		Bodies.trapezoid(124, 455, 210, 25, toRad(15), { angle: toRad(90), isStatic: true }),
+		Bodies.trapezoid(376, 245, 210, 25, toRad(15), { angle: toRad(-90), isStatic: true }),
+		Bodies.trapezoid(376, 455, 210, 25, toRad(15), { angle: toRad(-90), isStatic: true }),
+		Bodies.trapezoid(250, 576, 220, 25, toRad(15), { isStatic: true }),
 	]
 	
 	World.add(engine.world, walls);
@@ -50,7 +58,7 @@ for (let i = 0; i < layers; i++) {
 	let poolBall = Bodies.circle(250, 500, 10, { label: "ball", render: { fillStyle: "#fff" } });
 	World.add(engine.world, poolBall);
 
-	Body.applyForce(poolBall, poolBall.position, { x: (Math.random() - 0.5) / 100, y: (Math.random() - 0.5) / 100 });
+	Body.applyForce(poolBall, poolBall.position, { x: ((Math.random() - 0.5) * 2) / 100, y: (Math.random() * -1.5) / 100 });
 
 	// start
 	Runner.run(runner, engine);
@@ -100,3 +108,11 @@ ctx.font = "1em Arial";
 		}
 	}
 })();
+
+function toDeg(angle) {
+	return angle * (180/Math.PI)
+}
+
+function toRad(angle) {
+	return angle * (Math.PI/180)
+}

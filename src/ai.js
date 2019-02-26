@@ -26,14 +26,18 @@ for (let i = 0; i < layers; i++) {
 	engines.push(engine);
 
 	engine.best = 0;
+	engine.invalid = false;
 	engine.enableSleeping = true;
 	engine.world.gravity.scale = 0;
 
-	Events.on(engine, "collisionActive", (e) => {
+	Events.on(engine, "collisionStart", (e) => {
 		e.pairs.forEach((pair) => {
-			if (pair.bodyA.label == "hole" || pair.bodyB.label == "hole") {
-				let hole = pair.bodyA.label == "hole" ? pair.bodyA : pair.bodyB;
-				let ball = pair.bodyA.label == "hole" ? pair.bodyB : pair.bodyA;
+			if (pair.bodyA.isSensor || pair.bodyB.isSensor) {
+				let hole = pair.bodyA.isSensor ? pair.bodyA : pair.bodyB;
+				let ball = pair.bodyA.isSensor ? pair.bodyB : pair.bodyA;
+
+				if (ball.label == "cueball" || ball.label == "eight")
+					engine.invalid = true;
 
 				World.remove(engine.world, ball);
 
@@ -51,10 +55,10 @@ for (let i = 0; i < layers; i++) {
 
 	{ // create holes
 		let holes = [
-			Bodies.rectangle(250, 123, 300, 25,  { label: "hole", isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(250, 577, 300, 25,  { label: "hole", isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(123, 350, 25,  500, { label: "hole", isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(377, 350, 25,  500, { label: "hole", isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
+			Bodies.rectangle(250, 123, 300, 25,  { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
+			Bodies.rectangle(250, 577, 300, 25,  { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
+			Bodies.rectangle(123, 350, 25,  500, { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
+			Bodies.rectangle(377, 350, 25,  500, { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
 		]
 
 		World.add(engine.world, holes);
@@ -88,8 +92,6 @@ for (let i = 0; i < layers; i++) {
 	let cueBall = Bodies.circle(250, 500, 10, { label: "cueball", render: { fillStyle: "#fff" } });
 	World.add(engine.world, cueBall);
 
-	Body.applyForce(cueBall, cueBall.position, { x: ((Math.random() - 0.5) * 2) / 100, y: (Math.random() * -1.5) / 100 });
-
 	// start
 	Runner.run(runner, engine);
 }
@@ -115,7 +117,7 @@ ctx.font = "1em Arial";
 			let vertices = body.vertices;
 
 			if (!body.render.visible) continue;
-			if ((body.label == "hole" || body.label == "wall") && i != 0) continue;
+			if ((body.isSensor || body.label == "wall") && i != 0) continue;
 
 			if (body.label == "eight" || body.label == "ball" || body.label == "cueball") {
 				ctx.beginPath();
@@ -145,8 +147,10 @@ setTimeout(() => {
 
 	engines.forEach((e, i) => {
 		if (e.best > best) {
-			best = e.best;
-			bestEngine = e;
+			if (!e.invalid) {
+				best = e.best;
+				bestEngine = e;
+			}
 		}
 
 		Runner.stop(runners[i]);

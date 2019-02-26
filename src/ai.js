@@ -4,7 +4,6 @@ let Body = Matter.Body;
 let Composite = Matter.Composite;
 let Runner = Matter.Runner;
 let Mouse = Matter.Mouse;
-let MouseConstraint = Matter.MouseConstraint;
 let Bodies = Matter.Bodies;
 
 let canvas = document.createElement('canvas');
@@ -24,30 +23,19 @@ let runner = Runner.create({
 });
 
 // create bodies
-let world = [
+let walls = [
 	Bodies.rectangle(250, 100, 300, 25, { isStatic: true }),
 	Bodies.rectangle(100, 350, 25, 500, { isStatic: true }),
 	Bodies.rectangle(250, 600, 300, 25, { isStatic: true }),
 	Bodies.rectangle(400, 350, 25, 500, { isStatic: true }),
-
-	Bodies.circle(200, 350, 13),
 ]
 
-World.add(engine.world, world);
+World.add(engine.world, walls);
 
-// mouse control
-let mouse = Mouse.create(canvas);
-let mouseConstraint = MouseConstraint.create(engine, {
-	mouse: mouse,
-	constraint: {
-		stiffness: 1,
-		render: {
-			visible: false
-		}
-	}
-});
+let poolBall = Bodies.circle(250, 500, 10, { render: { fillStyle: "#fff" } });
+World.add(engine.world, poolBall);
 
-World.add(engine.world, mouseConstraint);
+Body.applyForce(poolBall, poolBall.position, { x: 0, y: -0.01 })
 
 // start engine
 Runner.run(runner, engine);

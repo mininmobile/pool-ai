@@ -95,7 +95,7 @@
 				restitution: 0.5,
 				friction: 0.1,
 				frictionStatic: 0.5,
-				frictionAir: 0.015,
+				frictionAir: 0.01,
 				collisionFilter: {
 					category: 0x0001,
 					mask: 0xFFFFFFFF,

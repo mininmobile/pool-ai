@@ -5,6 +5,7 @@ let Composite = Matter.Composite;
 let Runner = Matter.Runner;
 let Mouse = Matter.Mouse;
 let Bodies = Matter.Bodies;
+let Composites = Matter.Composites;
 
 let canvas = document.createElement('canvas');
 canvas.width = document.body.scrollWidth;
@@ -32,10 +33,16 @@ let walls = [
 
 World.add(engine.world, walls);
 
-let poolBall = Bodies.circle(250, 500, 10, { render: { fillStyle: "#fff" } });
+let balls = Composites.pyramid(165, 275, 9, 8, 0, -40, (x, y) => {
+	return Bodies.circle(x, y, 10, { label: "ball" });
+});
+
+World.add(engine.world, balls);
+
+let poolBall = Bodies.circle(250, 500, 10, { label: "ball", render: { fillStyle: "#fff" } });
 World.add(engine.world, poolBall);
 
-Body.applyForce(poolBall, poolBall.position, { x: 0, y: -0.01 })
+Body.applyForce(poolBall, poolBall.position, { x: 0, y: -0.015 })
 
 // start engine
 Runner.run(runner, engine);

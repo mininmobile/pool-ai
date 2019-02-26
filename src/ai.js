@@ -34,7 +34,7 @@ let walls = [
 World.add(engine.world, walls);
 
 let balls = Composites.pyramid(165, 275, 9, 8, 0, -40, (x, y) => {
-	return Bodies.circle(x, y, 10, { label: "ball" });
+	return Bodies.circle(x, y, 10, { label: y == 235 ? "eight" : "ball", render: { fillStyle: y == 235 ? "#000": undefined } });
 });
 
 World.add(engine.world, balls);
@@ -66,16 +66,22 @@ ctx.font = "1em Arial";
 
 		if (!body.render.visible) continue;
 
-		ctx.beginPath();
+		if (body.label == "eight" || body.label == "ball") {
+			ctx.beginPath();
 
-		ctx.moveTo(vertices[0].x, vertices[0].y);
-
-		for (let j = 1; j < vertices.length; j += 1) {
-			ctx.lineTo(vertices[j].x, vertices[j].y);
+			ctx.ellipse(body.position.x, body.position.y, body.circleRadius, body.circleRadius, 0, 0, Math.PI * 2);
+		} else {
+			ctx.beginPath();
+	
+			ctx.moveTo(vertices[0].x, vertices[0].y);
+	
+			for (let j = 1; j < vertices.length; j += 1) {
+				ctx.lineTo(vertices[j].x, vertices[j].y);
+			}
+	
+			ctx.lineTo(vertices[0].x, vertices[0].y);
 		}
-
-		ctx.lineTo(vertices[0].x, vertices[0].y);
-
+	
 		ctx.fillStyle = body.render.fillStyle;
 
 		ctx.fill();

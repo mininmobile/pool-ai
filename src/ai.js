@@ -13,8 +13,8 @@ canvas.height = document.body.scrollHeight;
 document.body.appendChild(canvas);
 
 // ai configuration
-let layers = 9;
-let iterations = 3;
+let layers = 100;
+let iterations = 1;
 
 // create engines
 let engines = [];
@@ -50,7 +50,7 @@ for (let i = 0; i < layers; i++) {
 	let poolBall = Bodies.circle(250, 500, 10, { label: "ball", render: { fillStyle: "#fff" } });
 	World.add(engine.world, poolBall);
 
-	Body.applyForce(poolBall, poolBall.position, { x: -(Math.random() / 100), y: -(Math.random() / 100) });
+	Body.applyForce(poolBall, poolBall.position, { x: (Math.random() - 0.5) / 100, y: (Math.random() - 0.5) / 100 });
 
 	// start
 	Runner.run(runner, engine);

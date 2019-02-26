@@ -14,7 +14,8 @@ document.body.appendChild(canvas);
 
 // ai configuration
 let layers = 100;
-let iterations = 1;
+let iterations = 3;
+let currentIteration = 0;
 
 // create engines
 let bestEngine;
@@ -55,10 +56,10 @@ for (let i = 0; i < layers; i++) {
 
 	{ // create holes
 		let holes = [
-			Bodies.rectangle(250, 123, 300, 25,  { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(250, 577, 300, 25,  { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(123, 350, 25,  500, { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
-			Bodies.rectangle(377, 350, 25,  500, { isStatic: true, isSensor: true, render: { fillStyle: "#000" } }),
+			Bodies.rectangle(250, 123, 300, 25,  { isStatic: true, isSensor: true, render: { visible: false } }),
+			Bodies.rectangle(250, 577, 300, 25,  { isStatic: true, isSensor: true, render: { visible: false } }),
+			Bodies.rectangle(123, 350, 25,  500, { isStatic: true, isSensor: true, render: { visible: false } }),
+			Bodies.rectangle(377, 350, 25,  500, { isStatic: true, isSensor: true, render: { visible: false } }),
 		]
 
 		World.add(engine.world, holes);
@@ -92,6 +93,8 @@ for (let i = 0; i < layers; i++) {
 	let cueBall = Bodies.circle(250, 500, 10, { label: "cueball", render: { fillStyle: "#fff" } });
 	World.add(engine.world, cueBall);
 
+	Body.applyForce(cueBall, cueBall.position, { x: ((Math.random() - 0.5) * 2) / 100, y: (Math.random() * -1.5) / 100 });
+
 	// start
 	Runner.run(runner, engine);
 }
@@ -99,13 +102,16 @@ for (let i = 0; i < layers; i++) {
 // start rendering
 let ctx = canvas.getContext("2d");
 ctx.lineWidth = 2;
-ctx.font = "1em Arial";
+ctx.font = "3em Arial";
 
 (function render() {
 	window.requestAnimationFrame(render);
 
 	ctx.fillStyle = "#161621";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	ctx.fillStyle = "#212126";
+	ctx.fillText(currentIteration, 50, 65);
 
 	for (let i = 0; i < engines.length; i += 1) {
 		let engine = engines[i];
@@ -156,9 +162,54 @@ setTimeout(() => {
 		Runner.stop(runners[i]);
 	});
 
-	engines = [bestEngine];
-	console.log(best);
+	runners = [];
+	engines = [];
+
+	nextIteration();
 }, 15000);
+
+function nextIteration() {
+	for (let i = 0; i < layers; i++) {
+		let engine = Engine.create();
+		engines.push(engine);
+	
+		engine.best = 0;
+		engine.invalid = false;
+		engine.enableSleeping = true;
+		engine.world.gravity.scale = 0;
+
+		Engine.merge(engine, bestEngine);
+	
+		Events.on(engine, "collisionStart", (e) => {
+			e.pairs.forEach((pair) => {
+				if (pair.bodyA.isSensor || pair.bodyB.isSensor) {
+					let hole = pair.bodyA.isSensor ? pair.bodyA : pair.bodyB;
+					let ball = pair.bodyA.isSensor ? pair.bodyB : pair.bodyA;
+	
+					if (ball.label == "cueball" || ball.label == "eight")
+						engine.invalid = true;
+	
+					World.remove(engine.world, ball);
+	
+					engine.best++;
+				}
+			});
+		});
+	
+		let runner = Runner.create({
+			delta: 1000 / 30,
+			isFixed: false,
+			enabled: true,
+		});
+		runners.push(runner);
+	
+		let cueBall = engine.cueBall;
+		Body.applyForce(cueBall, cueBall.position, { x: ((Math.random() - 0.5) * 2) / 100, y: ((Math.random() - 0.5) * 2) / 100 });
+	
+		// start
+		Runner.run(runner, engine);
+	}
+}
 
 function toDeg(angle) {
 	return angle * (180/Math.PI)

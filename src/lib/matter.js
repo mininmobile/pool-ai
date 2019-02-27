@@ -72,6 +72,7 @@
 				id: Common.nextId(),
 				type: 'body',
 				label: 'Body',
+				yes: true,
 				parts: [],
 				plugin: {},
 				angle: 0,
@@ -1357,6 +1358,7 @@
 				switch (obj.type) {
 
 				case 'body':
+					obj.yes = false;
 					Composite.removeBody(composite, obj, deep);
 					break;
 				case 'constraint':
